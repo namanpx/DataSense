@@ -39,21 +39,11 @@ def get_db_connection() -> duckdb.DuckDBPyConnection:
 
 def load_sample_data() -> None:
     """
-    Load sample_orders.csv into DuckDB as the 'orders' table.
+    Load Superstore Sales dataset into DuckDB as the 'orders' table.
     Safe to call multiple times — drops and recreates the table.
     """
-    if not Path(CSV_PATH).exists():
-        raise FileNotFoundError(f"Sample CSV not found: {CSV_PATH}")
-
-    con = get_db_connection()
-    con.execute("DROP TABLE IF EXISTS orders")
-    con.execute(f"""
-        CREATE TABLE orders AS
-        SELECT * FROM read_csv_auto('{CSV_PATH}', header=True)
-    """)
-    row_count = con.execute("SELECT COUNT(*) FROM orders").fetchone()[0]
-    con.close()
-    logger.info("[DB] Loaded %d rows into 'orders' table at %s", row_count, DB_PATH)
+    from backend.agent.load_superstore import load_into_duckdb
+    load_into_duckdb()
 
 
 # ---------------------------------------------------------------------------

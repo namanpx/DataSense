@@ -1,0 +1,9 @@
+/* Basic styling for DataSense */
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+h1, h2, h3 {
+    color: #1f77b4;
+}

@@ -52,36 +52,58 @@ def generate_insights(df):
     
     return insights
 
-# Function to call Gemini API (Optional)
-def get_ai_analysis(df, question):
-    """Get AI-powered analysis using Gemini API"""
+def get_env_var(key, default=None):
+    """Read an environment variable with optional default."""
+    return os.getenv(key, default)
+
+
+def create_ai_prompt(df, question):
+    """Build the prompt for the AI model from the dataframe context."""
+    return f"""
+I have a dataset with {len(df)} rows and these columns: {', '.join(df.columns)}.
+
+Summary statistics:
+{df.describe().to_string()}
+
+Please answer this question about the data: {question}
+Keep the answer brief and actionable.
+"""
+
+
+def fetch_ai_analysis(df, question):
+    """Fetch AI-powered analysis using environment-configured Gemini settings."""
     try:
         import google.generativeai as genai
-        
-        api_key = os.getenv("GEMINI_API_KEY")
-        if not api_key:
-            return "❌ Please set GEMINI_API_KEY environment variable to use AI chat"
-        
-        genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-pro')
-        
-        # Create context about the data
-        context = f"""
-        I have a dataset with {len(df)} rows and these columns: {', '.join(df.columns)}.
-        
-        Summary statistics:
-        {df.describe().to_string()}
-        
-        Please answer this question about the data: {question}
-        Keep the answer brief and actionable.
-        """
-        
-        response = model.generate_content(context)
-        return response.text
     except ImportError:
-        return "⚠️ Install google-generativeai: `pip install google-generativeai`"
-    except Exception as e:
-        return f"❌ Error: {str(e)}"
+        return {
+            "status": "warning",
+            "message": "Install google-generativeai to enable AI chat: `pip install google-generativeai`"
+        }
+
+    api_key = get_env_var("GEMINI_API_KEY")
+    if not api_key:
+        return {
+            "status": "error",
+            "message": "Please set GEMINI_API_KEY environment variable to use AI chat"
+        }
+
+    api_url = get_env_var("GEMINI_API_URL")
+    try:
+        if api_url:
+            try:
+                genai.configure(api_key=api_key, api_url=api_url)
+            except TypeError:
+                genai.configure(api_key=api_key)
+        else:
+            genai.configure(api_key=api_key)
+
+        model = genai.GenerativeModel("gemini-pro")
+        prompt = create_ai_prompt(df, question)
+        response = model.generate_content(prompt)
+        return {"status": "success", "message": response.text}
+    except Exception as exc:
+        return {"status": "error", "message": f"Error during AI request: {str(exc)}"}
+
 
 # Main content
 if uploaded_file is not None:
@@ -237,15 +259,22 @@ if uploaded_file is not None:
         
         if user_question:
             with st.spinner("🤔 Thinking..."):
-                response = get_ai_analysis(df, user_question)
-                st.markdown(response)
+                result = fetch_ai_analysis(df, user_question)
+                if result["status"] == "success":
+                    st.success("AI answer delivered successfully")
+                    st.markdown(result["message"])
+                elif result["status"] == "warning":
+                    st.warning(result["message"])
+                else:
+                    st.error(result["message"])
         
         with st.expander("📖 How to enable AI chat:"):
             st.markdown("""
             1. Get a free API key from [Google AI Studio](https://aistudio.google.com/app/apikey)
-            2. Set environment variable:
+            2. Set environment variables:
                ```bash
                export GEMINI_API_KEY="your_api_key_here"
+               export GEMINI_API_URL="https://us-central1-generativelanguage.googleapis.com/v1beta2"
                ```
             3. Install Google AI library:
                ```bash

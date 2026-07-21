@@ -135,6 +135,16 @@ async def _read_upload_with_limit(file: UploadFile) -> bytes:
 # Endpoints
 # ---------------------------------------------------------------------------
 
+@app.on_event("startup")
+def startup_event():
+    import threading
+    try:
+        from backend.seed import seed
+        threading.Thread(target=seed, daemon=True).start()
+    except Exception as e:
+        logger.warning("Startup seed scheduling failed: %s", e)
+
+
 @app.get("/", tags=["health"])
 def health_check():
     return {"status": "ok", "version": app.version}

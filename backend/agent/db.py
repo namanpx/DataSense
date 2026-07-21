@@ -19,9 +19,7 @@ logger = logging.getLogger(__name__)
 # Paths
 # ---------------------------------------------------------------------------
 
-_PROJECT_ROOT = Path(__file__).resolve().parents[2]   # …/data-analyst-agent/
-DB_PATH       = str(_PROJECT_ROOT / "data" / "analytics.duckdb")
-CSV_PATH      = str(_PROJECT_ROOT / "data" / "sample_orders.csv")
+from backend.core.config import DB_PATH
 
 
 # ---------------------------------------------------------------------------

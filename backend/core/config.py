@@ -20,7 +20,6 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = PROJECT_ROOT / "data"
 
 DB_PATH = str(DATA_DIR / "analytics.duckdb")
-CSV_PATH = str(DATA_DIR / "sample_orders.csv")
 
 CHROMA_PATH = str(DATA_DIR / "chroma_db")
 COLLECTION_NAME = "documents"

@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: datasense-backend
+    runtime: python
+    rootDir: .
+    buildCommand: pip install -r backend/requirements.txt && chmod +x start.sh
+    startCommand: bash start.sh
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false          # paste your key in the Render dashboard
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: MODEL_NAME
+        value: "llama-3.3-70b-versatile"

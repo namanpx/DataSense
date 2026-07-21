@@ -29,11 +29,12 @@ ENV/
 !.env.example
 
 # ── Data files (large datasets — add back specific files if needed) ────────────
-data/**/*.csv
 data/**/*.parquet
 data/**/*.json
 data/**/*.db
 data/**/*.duckdb
+# Allow seed CSVs in data/raw/ to be committed (needed for Render deployment)
+!data/raw/*.csv
 
 # ── ChromaDB persisted store ──────────────────────────────────────────────────
 chroma_db/

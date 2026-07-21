@@ -1,0 +1,394 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>DataSense AI Terminal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=JetBrains+Mono:wght@100..800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        .cursor-blink {
+            animation: blink 1s infinite;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .cyan-glow {
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.1);
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(135, 147, 144, 0.3);
+            border-radius: 10px;
+        }
+        .terminal-input-focus:focus {
+            outline: none;
+            border-bottom: 1px solid #00F5FF;
+            box-shadow: 0 4px 12px -4px rgba(0, 245, 255, 0.3);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary": "#7ad7c6",
+                      "electric-cyan": "#00F5FF",
+                      "inverse-on-surface": "#313030",
+                      "on-primary-container": "#cefff4",
+                      "tertiary-fixed": "#ffdbd0",
+                      "surface-bright": "#3a3939",
+                      "secondary-fixed": "#63f7ff",
+                      "surface-variant": "#353534",
+                      "on-error": "#690005",
+                      "tertiary-fixed-dim": "#ffb59f",
+                      "surface-tint": "#7ad7c6",
+                      "on-error-container": "#ffdad6",
+                      "inverse-surface": "#e5e2e1",
+                      "on-tertiary": "#581e0a",
+                      "on-tertiary-fixed-variant": "#75331e",
+                      "primary-fixed-dim": "#7ad7c6",
+                      "on-surface-variant": "#bdc9c5",
+                      "surface": "#131313",
+                      "on-secondary-fixed-variant": "#004f53",
+                      "primary-container": "#0c7e70",
+                      "error": "#ffb4ab",
+                      "on-secondary-container": "#006c71",
+                      "primary-fixed": "#96f3e2",
+                      "surface-container-lowest": "#0e0e0e",
+                      "on-primary-fixed": "#00201c",
+                      "on-surface": "#e5e2e1",
+                      "background": "#131313",
+                      "surface-charcoal": "#111111",
+                      "on-tertiary-fixed": "#3a0a00",
+                      "secondary-container": "#00f4fe",
+                      "surface-container-highest": "#353534",
+                      "matrix-green": "#0C7E70",
+                      "surface-container-low": "#1c1b1b",
+                      "secondary-fixed-dim": "#00dce5",
+                      "inverse-primary": "#006b5e",
+                      "tertiary": "#ffb59f",
+                      "on-background": "#e5e2e1",
+                      "surface-container": "#201f1f",
+                      "on-secondary-fixed": "#002021",
+                      "on-tertiary-container": "#fff3f0",
+                      "glass-border": "rgba(255, 255, 255, 0.1)",
+                      "error-container": "#93000a",
+                      "surface-dim": "#131313",
+                      "terminal-black": "#050505",
+                      "outline": "#879390",
+                      "surface-container-high": "#2a2a2a",
+                      "tertiary-container": "#a85b43",
+                      "on-primary-fixed-variant": "#005047",
+                      "outline-variant": "#3e4946",
+                      "on-primary": "#003730",
+                      "on-secondary": "#003739",
+                      "secondary": "#e6feff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "container-max": "1440px",
+                      "gutter": "24px",
+                      "margin": "32px",
+                      "unit": "4px"
+              },
+              "fontFamily": {
+                      "headline-lg": ["Geist"],
+                      "terminal-log": ["JetBrains Mono"],
+                      "headline-lg-mobile": ["Geist"],
+                      "body-md": ["Geist"],
+                      "headline-md": ["Geist"],
+                      "label-caps": ["JetBrains Mono"],
+                      "terminal-code": ["JetBrains Mono"]
+              },
+              "fontSize": {
+                      "headline-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "terminal-log": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                      "headline-lg-mobile": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "headline-md": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                      "terminal-code": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+      </script>
+</head>
+<body class="bg-terminal-black text-on-surface selection:bg-electric-cyan/30 overflow-hidden h-screen flex flex-col">
+<!-- Global Background Shader -->
+<!-- STITCH_SHADER_START:ANIMATION_1 class="fixed inset-0 w-full h-full pointer-events-none opacity-40 z-0" -->
+<div class="fixed inset-0 w-full h-full pointer-events-none opacity-40 z-0" style="display:block;">
+<canvas id="shader-canvas-ANIMATION_1" style="display:block;width:100%;height:100%" width="1280" height="1024"></canvas>
+<script>
+(function() {
+  const canvas = document.getElementById('shader-canvas-ANIMATION_1');
+
+  // Sync the WebGL drawing-buffer size with the CSS-driven layout size.
+  // This fires on initial layout and whenever the element is resized.
+  function syncSize() {
+    const w = canvas.clientWidth  || 1280;
+    const h = canvas.clientHeight || 720;
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width  = w;
+      canvas.height = h;
+    }
+  }
+  if (typeof ResizeObserver !== 'undefined') {
+    new ResizeObserver(syncSize).observe(canvas);
+  }
+  syncSize();
+
+  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+  if (!gl) return;
+  const vs = `attribute vec2 a_position;
+varying vec2 v_texCoord;
+void main() {
+  v_texCoord = a_position * 0.5 + 0.5;
+  gl_Position = vec4(a_position, 0.0, 1.0);
+}`;
+  const fs = `precision highp float;
+varying vec2 v_texCoord;
+uniform float u_time;
+uniform vec2 u_resolution;
+
+void main() {
+    vec2 uv = v_texCoord;
+    float time = u_time * 0.2;
+    
+    // Create a subtle moving gradient mesh
+    float n = sin(uv.x * 3.0 + time) * cos(uv.y * 2.0 - time);
+    float n2 = sin(uv.y * 4.0 - time * 1.5) * cos(uv.x * 1.0 + time);
+    
+    vec3 color1 = vec3(0.02, 0.05, 0.1); // Deep Navy
+    vec3 color2 = vec3(0.05, 0.02, 0.08); // Deep Purple
+    vec3 color3 = vec3(0.01, 0.1, 0.08);  // Deep Teal
+    
+    vec3 finalColor = mix(color1, color2, n * 0.5 + 0.5);
+    finalColor = mix(finalColor, color3, n2 * 0.5 + 0.5);
+    
+    // Add subtle grain
+    float grain = fract(sin(dot(uv, vec2(12.9898, 78.233))) * 43758.5453);
+    finalColor += grain * 0.02;
+
+    gl_FragColor = vec4(finalColor, 1.0);
+}`;
+  function cs(type, src) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    return s;
+  }
+  const prog = gl.createProgram();
+  gl.attachShader(prog, cs(gl.VERTEX_SHADER, vs));
+  gl.attachShader(prog, cs(gl.FRAGMENT_SHADER, fs));
+  gl.linkProgram(prog);
+  gl.useProgram(prog);
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+  const pos = gl.getAttribLocation(prog, 'a_position');
+  gl.enableVertexAttribArray(pos);
+  gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+  const uTime = gl.getUniformLocation(prog, 'u_time');
+  const uRes = gl.getUniformLocation(prog, 'u_resolution');
+  const uMouse = gl.getUniformLocation(prog, 'u_mouse');
+
+  // u_mouse is in pixel coordinates matching u_resolution (ShaderToy convention).
+  // Shaders that need normalized coords should use: u_mouse / u_resolution.
+  let mouse = { x: canvas.width / 2, y: canvas.height / 2 };
+  window.addEventListener('mousemove', (event) => {
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width && rect.height) {
+      const nx = (event.clientX - rect.left) / rect.width;
+      const ny = 1.0 - (event.clientY - rect.top) / rect.height;
+      mouse.x = nx * canvas.width;
+      mouse.y = ny * canvas.height;
+    }
+  });
+
+  function render(t) {
+    if (typeof ResizeObserver === 'undefined') syncSize();
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    if (uTime) gl.uniform1f(uTime, t * 0.001);
+    if (uRes) gl.uniform2f(uRes, canvas.width, canvas.height);
+    if (uMouse) gl.uniform2f(uMouse, mouse.x, mouse.y);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    requestAnimationFrame(render);
+  }
+  render(0);
+})();
+</script>
+</div>
+<!-- STITCH_SHADER_END:ANIMATION_1 -->
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl dark:bg-surface/80 border-b border-white/10">
+<div class="flex justify-between items-center px-gutter h-16 w-full max-w-container-max mx-auto">
+<div class="flex items-center gap-4">
+<div class="w-8 h-8 rounded-lg bg-gradient-to-br from-electric-cyan to-matrix-green flex items-center justify-center shadow-lg shadow-electric-cyan/20">
+<span class="material-symbols-outlined text-terminal-black text-xl font-bold">query_stats</span>
+</div>
+<h1 class="font-headline-md text-headline-md font-bold text-on-surface tracking-tighter">DataSense v1.0</h1>
+</div>
+<nav class="hidden md:flex gap-8 items-center">
+<span class="text-electric-cyan font-bold font-terminal-log text-terminal-log cursor-pointer transition-colors hover:text-primary">TERMINAL</span>
+<span class="text-outline font-terminal-log text-terminal-log cursor-pointer transition-colors hover:text-primary">ARCHIVE</span><a href="#ingestion-section" class="text-matrix-green font-terminal-log text-terminal-log cursor-pointer transition-colors hover:text-electric-cyan border-b border-matrix-green/30 pb-0.5">SOURCES</a>
+<span class="text-outline font-terminal-log text-terminal-log cursor-pointer transition-colors hover:text-primary">SYSTEM</span>
+</nav>
+<div class="flex items-center gap-4">
+<button class="p-2 text-outline hover:text-electric-cyan transition-colors" title="System Sensors">
+<span class="material-symbols-outlined">sensors</span>
+</button>
+<button class="p-2 text-outline hover:text-electric-cyan transition-colors" title="Settings" onclick="window.location.href='{{DATA:SCREEN:SCREEN_24}}'">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-24 pb-32 px-4 md:px-8 relative z-10 overflow-y-auto w-full max-w-4xl mx-auto flex flex-col gap-8"><div class="flex justify-center mb-4"><a href="#ingestion-section" class="flex items-center gap-2 px-4 py-2 rounded-full bg-matrix-green/10 border border-matrix-green text-matrix-green font-terminal-log text-[11px] uppercase tracking-widest hover:bg-matrix-green hover:text-terminal-black transition-all shadow-lg shadow-matrix-green/20"><span class="material-symbols-outlined text-sm">upload_file</span> Manage Data Sources <span class="material-symbols-outlined text-sm animate-bounce">arrow_downward</span></a></div>
+<!-- Welcome Message -->
+<div class="flex flex-col gap-2 opacity-60">
+<p class="font-terminal-log text-terminal-log text-matrix-green uppercase tracking-widest">[ session_start: 1724390400 ]</p>
+<p class="font-body-md text-body-md text-outline">Terminal initialized. All sensors nominal. I am DataSense AI, ready for sovereign computation. What metrics shall we visualize today?</p>
+</div>
+<!-- User Message -->
+<div class="flex flex-col items-end gap-2">
+<div class="flex items-center gap-2 mb-1">
+<span class="font-terminal-log text-[10px] text-outline uppercase">Operator</span>
+<span class="w-2 h-2 rounded-full bg-outline/40"></span>
+</div>
+<div class="px-6 py-4 rounded-2xl bg-surface-container-low border border-white/5 max-w-[85%]">
+<p class="font-body-md text-body-md text-on-surface">Analyze regional sales performance across North America for Q3. Identify outliers and projected growth.</p>
+</div>
+</div>
+<!-- AI Response (Glassmorphic Card) -->
+<div class="flex flex-col items-start gap-3 w-full">
+<div class="flex items-center gap-2 mb-1">
+<span class="w-2 h-2 rounded-full bg-electric-cyan animate-pulse shadow-[0_0_8px_#00F5FF]"></span>
+<span class="font-terminal-log text-[10px] text-electric-cyan uppercase tracking-wider">DataSense Core</span>
+<div class="flex gap-2 ml-4">
+<span class="px-2 py-0.5 rounded border border-matrix-green/30 bg-matrix-green/5 font-terminal-log text-[10px] text-matrix-green">[route: sql]</span>
+<span class="px-2 py-0.5 rounded border border-white/10 bg-white/5 font-terminal-log text-[10px] text-outline">[query_time: 1.2s]</span>
+</div>
+</div>
+<div class="glass-panel cyan-glow w-full p-6 md:p-8 rounded-3xl flex flex-col gap-6">
+<div class="flex flex-col gap-4">
+<p class="font-body-md text-body-md text-on-surface leading-relaxed">
+                        Query execution complete. Analysis indicates a <span class="text-electric-cyan font-bold">14.2% increase</span> in regional performance compared to Q2. The growth is primarily driven by the Tech Sector in the Pacific Northwest.
+                    </p>
+<!-- Plotly Chart Placeholder -->
+<div class="relative group cursor-crosshair">
+<div class="w-full h-64 rounded-xl overflow-hidden glass-panel flex items-center justify-center relative">
+<!-- Background Blur Texture for the "Chart" -->
+<div class="absolute inset-0 opacity-20 pointer-events-none">
+<div class="absolute top-1/4 left-1/4 w-32 h-32 bg-electric-cyan rounded-full blur-[60px]"></div>
+<div class="absolute bottom-1/4 right-1/4 w-40 h-40 bg-matrix-green rounded-full blur-[80px]"></div>
+</div>
+<!-- Simplified UI Bars representing a chart -->
+<div class="flex items-end gap-3 h-32 w-full max-w-lg px-8 relative z-10">
+<div class="flex-1 bg-outline/20 rounded-t-sm h-[40%] group-hover:bg-outline/30 transition-all"></div>
+<div class="flex-1 bg-outline/20 rounded-t-sm h-[60%] group-hover:bg-outline/30 transition-all"></div>
+<div class="flex-1 bg-electric-cyan/40 rounded-t-sm h-[90%] group-hover:h-[95%] transition-all border-t-2 border-electric-cyan"></div>
+<div class="flex-1 bg-outline/20 rounded-t-sm h-[50%] group-hover:bg-outline/30 transition-all"></div>
+<div class="flex-1 bg-matrix-green/40 rounded-t-sm h-[75%] group-hover:h-[80%] transition-all border-t-2 border-matrix-green"></div>
+<div class="flex-1 bg-outline/20 rounded-t-sm h-[30%] group-hover:bg-outline/30 transition-all"></div>
+</div>
+<div class="absolute top-4 right-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-sm">fullscreen</span>
+<span class="material-symbols-outlined text-outline text-sm">download</span>
+</div>
+<div class="absolute bottom-4 left-4 font-terminal-log text-[10px] text-outline uppercase">Interactive Visualization: Q3_Regional_Growth.dat</div>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="p-4 rounded-xl bg-white/5 border border-white/5">
+<span class="font-terminal-log text-[10px] text-outline uppercase block mb-1">Outlier Detected</span>
+<p class="font-body-md text-on-surface">Northeast Division shows a <span class="text-error">-4% dip</span> in logistics efficiency due to supply chain latency.</p>
+</div>
+<div class="p-4 rounded-xl bg-white/5 border border-white/5">
+<span class="font-terminal-log text-[10px] text-outline uppercase block mb-1">Growth Forecast</span>
+<p class="font-body-md text-on-surface">Projected <span class="text-matrix-green font-bold">+8.5%</span> for Q4 based on current momentum in Canada West.</p>
+</div>
+</div>
+</div>
+<div class="pt-4 border-t border-white/5 flex justify-between items-center">
+<div class="flex gap-4">
+<button class="flex items-center gap-2 text-outline hover:text-electric-cyan transition-colors">
+<span class="material-symbols-outlined text-lg">thumb_up</span>
+</button>
+<button class="flex items-center gap-2 text-outline hover:text-error transition-colors">
+<span class="material-symbols-outlined text-lg">thumb_down</span>
+</button>
+</div>
+<button class="flex items-center gap-2 text-outline hover:text-white transition-colors font-terminal-log text-[11px] uppercase tracking-wider">
+<span class="material-symbols-outlined text-lg">content_copy</span> Copy Report
+                    </button>
+</div>
+</div>
+</div>
+<section id="ingestion-section" class="glass-panel cyan-glow w-full p-6 md:p-8 rounded-3xl flex flex-col gap-6 border-matrix-green/30"><div class="flex items-center justify-between"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-electric-cyan">cloud_upload</span><h2 class="font-headline-md text-xl font-bold text-on-surface uppercase tracking-tight">Data &amp; Knowledge Ingestion</h2></div><span class="px-2 py-0.5 rounded border border-matrix-green/30 bg-matrix-green/5 font-terminal-log text-[10px] text-matrix-green">STATUS: READY</span></div><div class="border-2 border-dashed border-white/10 rounded-2xl p-12 flex flex-col items-center justify-center gap-4 hover:border-electric-cyan/50 transition-colors cursor-pointer group"><div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform"><span class="material-symbols-outlined text-outline group-hover:text-electric-cyan">add</span></div><div class="text-center"><p class="font-body-md text-on-surface">Drop files here or click to upload</p><p class="font-terminal-log text-[10px] text-outline mt-1">SUPPORTED: .CSV, .JSON, .SQL, .DAT</p></div></div></section></main>
+<!-- Terminal Input Area -->
+<footer class="fixed bottom-0 w-full z-50 bg-surface-container-lowest/10 backdrop-blur-2xl border-t border-white/5">
+<div class="max-w-4xl mx-auto w-full px-4 py-6 md:py-8">
+<div class="relative flex items-center">
+<span class="absolute left-0 text-electric-cyan font-terminal-code text-headline-md font-bold select-none cursor-default">{</span>
+<span class="absolute left-6 text-electric-cyan font-terminal-code text-headline-md font-bold select-none cursor-default">&gt;</span>
+<input autofocus="" class="w-full bg-transparent border-none pl-14 pr-12 py-4 font-terminal-code text-terminal-code text-on-surface placeholder:text-outline/40 terminal-input-focus border-b border-transparent transition-all" placeholder="ask something..." type="text">
+<div class="absolute right-0 flex items-center gap-3">
+<span class="w-3 h-5 bg-electric-cyan cursor-blink"></span>
+<button class="flex items-center justify-center p-2 rounded-lg bg-matrix-green text-terminal-black hover:bg-electric-cyan transition-colors shadow-lg shadow-matrix-green/20 scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">send</span>
+</button>
+</div>
+</div>
+<!-- Quick Command Labels -->
+<div class="flex gap-4 mt-4 overflow-x-auto no-scrollbar">
+<button class="whitespace-nowrap px-3 py-1 rounded-full bg-white/5 border border-white/10 text-outline font-terminal-log text-[10px] uppercase tracking-tighter hover:bg-white/10 hover:text-electric-cyan transition-all">--visualize-trends</button>
+<button class="whitespace-nowrap px-3 py-1 rounded-full bg-white/5 border border-white/10 text-outline font-terminal-log text-[10px] uppercase tracking-tighter hover:bg-white/10 hover:text-electric-cyan transition-all">--audit-anomalies</button>
+<button class="whitespace-nowrap px-3 py-1 rounded-full bg-white/5 border border-white/10 text-outline font-terminal-log text-[10px] uppercase tracking-tighter hover:bg-white/10 hover:text-electric-cyan transition-all">--export-csv</button>
+<button class="whitespace-nowrap px-3 py-1 rounded-full bg-white/5 border border-white/10 text-outline font-terminal-log text-[10px] uppercase tracking-tighter hover:bg-white/10 hover:text-electric-cyan transition-all">--switch-mode sql</button>
+</div>
+</div>
+</footer>
+<!-- Script for blinking cursor and focus management -->
+<script>
+        document.addEventListener('keydown', (e) => {
+            if (e.key === '/' && document.activeElement.tagName !== 'INPUT') {
+                e.preventDefault();
+                document.querySelector('input').focus();
+            }
+        });
+        
+        // Auto-scroll logic (mock)
+        const main = document.querySelector('main');
+        const scrollToBottom = () => {
+            main.scrollTo({ top: main.scrollHeight, behavior: 'smooth' });
+        };
+        
+        // Initial scroll
+        window.onload = scrollToBottom;
+    </script>
+
+
+
+
+</body></html>

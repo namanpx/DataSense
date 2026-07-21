@@ -17,11 +17,7 @@ import argparse
 import logging
 import os
 from pathlib import Path
-from typing import Optional
-
-import chromadb
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from sentence_transformers import SentenceTransformer
+from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -44,10 +40,11 @@ EMBEDDING_MODEL_NAME = "all-MiniLM-L6-v2"
 _embedding_model: Optional[SentenceTransformer] = None
 
 
-def get_embedding_model() -> SentenceTransformer:
+def get_embedding_model() -> Any:
     """Return the sentence-transformers model (lazy-loaded, cached)."""
     global _embedding_model
     if _embedding_model is None:
+        from sentence_transformers import SentenceTransformer
         logger.info("[ingest] Loading embedding model '%s'…", EMBEDDING_MODEL_NAME)
         _embedding_model = SentenceTransformer(EMBEDDING_MODEL_NAME)
         logger.info("[ingest] Embedding model loaded.")
@@ -64,8 +61,9 @@ def embed_texts(texts: list[str]) -> list[list[float]]:
 # ChromaDB collection
 # ---------------------------------------------------------------------------
 
-def get_chroma_collection() -> chromadb.Collection:
+def get_chroma_collection() -> Any:
     """Return (or create) the persistent ChromaDB collection."""
+    import chromadb
     client = chromadb.PersistentClient(path=CHROMA_PATH)
     return client.get_or_create_collection(
         name=COLLECTION_NAME,
@@ -114,6 +112,7 @@ def chunk_text(text: str, source_name: str) -> list[dict]:
     Split text into overlapping chunks.
     Returns list of dicts: {"text": ..., "source": ..., "chunk_index": ...}
     """
+    from langchain_text_splitters import RecursiveCharacterTextSplitter
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=CHUNK_SIZE,
         chunk_overlap=CHUNK_OVERLAP,
